@@ -9,9 +9,18 @@ int main(char argc, char **argv)
 
     uint8_t *img;
     uint32_t w, h;
-    if(0 == read_bmp_file(string(argv[1]), &w, &h, &img))
+    if(0 == read_bmp_file_mono(string(argv[1]), &w, &h, &img))
     {
-        save_bmp_file("output.bmp", w, h, img);
+        save_bmp_file_mono("output.bmp", w, h, img);
     }
+
+    if(argc <3)
+        return 0;
+
+    if(0 == read_bmp_file_rgb(string(argv[2]), &w, &h, &img))
+    {
+        save_bmp_file_rgb("output-rgb.bmp", w, h, img);
+    }
+
     return 0;
 }

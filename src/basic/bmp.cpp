@@ -58,7 +58,6 @@ int init_bmp_header(BmpFileHeader *fh, BmpInfoHeader *ih, int width, int height)
     ih->ncolours = 0;
     ih->importantcolours = 0;
 
-
     fh->type = 0x4d42;
     fh->size = sizeof(BmpFileHeader) + sizeof(BmpInfoHeader) + 1024 + width*height;
     fh->offset = sizeof(BmpFileHeader) + sizeof(BmpInfoHeader) + 1024;
@@ -68,8 +67,75 @@ int init_bmp_header(BmpFileHeader *fh, BmpInfoHeader *ih, int width, int height)
     return 0;
 }
 
+int init_bmp_header_rgb(BmpFileHeader *fh, BmpInfoHeader *ih, int width,
+                        int height)
+{
+    ih->size = sizeof(BmpInfoHeader);
+    ih->width = width;
+    ih->height = -height; // save data from up to down.
+    ih->planes = 1;
+    ih->bits = 24;
+    ih->compression = 0;
+    ih->imagesize = 3*width*height;
+    ih->xresolution = 0;
+    ih->yresolution = 0;
+    ih->ncolours = 0;
+    ih->importantcolours = 0;
+
+    fh->type = 0x4d42;
+    fh->size = sizeof(BmpFileHeader) + sizeof(BmpInfoHeader) + width*height;
+    fh->offset = sizeof(BmpFileHeader) + sizeof(BmpInfoHeader) ;
+    fh->reserved1 = 0;
+    fh->reserved2 = 0;
+
+    return 0;
+}
+
+int read_bmp_file(string path, uint32_t *W, uint32_t *H, uint8_t**data, int ch)
+{
+    ifstream ifs(path, ios::binary);
+    if(!ifs.is_open())
+    {
+        cout<<"[ERROR], read_bmp_file, Cannot open file: "<<path<<endl;
+        return 1;
+    }
+
+    BmpFileHeader fh;
+    BmpInfoHeader ih;
+    ifs.read((char*)(&fh), sizeof(BmpFileHeader));
+    ifs.read((char*)(&ih), sizeof(BmpInfoHeader));
+    int w = ih.width;
+    int h = abs(ih.height);
+    if(ih.imagesize != ch*w*h)
+    {
+        cout<<"[ERROR], read_bmp_file, image size != w*h*3 !"<<endl;
+        return 1;
+    }
+
+    uint8_t *data_addr = new uint8_t[ch*w*h];
+    ifs.seekg(fh.offset, ios::beg);
+    if(ih.height <0 )
+    {
+        ifs.read((char*)data_addr, ih.imagesize);
+    }
+    else    // Flip image in vertical direction.
+    {
+        for(int r=h-1; r>=0; r--)
+        {
+            ifs.read((char*)(data_addr+ch*w*r), ch*w);
+        }
+    }
+
+    *W = w;
+    *H = h;
+    *data = data_addr;
+
+    return 0;
+}
+
+
 /**
- * @brief save_bmp_file Save 8-bit gray image in bmp file.
+ * @brief save_bmp_file_mono Save 8-bit gray image in bmp file.
  * @param path [IN] Save path.
  * @param width [IN] Image width.
  * @param height [IN] Image height.
@@ -78,7 +144,7 @@ int init_bmp_header(BmpFileHeader *fh, BmpInfoHeader *ih, int width, int height)
  * @return 0: success, others: fail.
  */
 
-int save_bmp_file(string path, int width, int height, unsigned char *buf,
+int save_bmp_file_mono(string path, int width, int height, unsigned char *buf,
                   uint8_t *palette = NULL)
 {
     ofstream file(path, ios::binary);
@@ -119,51 +185,62 @@ int save_bmp_file(string path, int width, int height, unsigned char *buf,
 }
 
 /**
- * @brief read_bmp_file The memory is allocted inside.
+ * @brief save_bmp_file_rgb Save 24-bit rgb image in bmp file.
+ * @param path [IN] Save path.
+ * @param width [IN] Image width.
+ * @param height [IN] Image height.
+ * @param buf [IN] Image data address.
+ * @return 0: success, others: fail.
+ */
+
+int save_bmp_file_rgb(string path, int width, int height, unsigned char *buf)
+{
+    ofstream file(path, ios::binary);
+    if (!file.is_open())
+    {
+        cout<<"Cannot open file to write,"<<endl;
+        return 1;
+    }
+
+    BmpFileHeader fh;
+    BmpInfoHeader ih;
+    init_bmp_header_rgb(&fh, &ih, width, height);
+
+    file.write((char*)(&fh), sizeof(BmpFileHeader));
+    file.write((char*)(&ih), sizeof(BmpInfoHeader));
+    file.write((char*)buf, ih.imagesize);
+    file.close();
+
+    return 0;
+}
+
+/**
+ * @brief read_bmp_file_mono Read 8-bit mono bmp image.
+ *        The memory is allocted inside.
  * @param path [IN] Image path.
  * @param W [OUT] Image width.
  * @param H [OUT] Image height.
  * @param data [OUT] Image data address.
  * @return 0: success, others: fail.
  */
-int read_bmp_file(string path, uint32_t *W, uint32_t *H, uint8_t**data)
+
+int read_bmp_file_mono(string path, uint32_t *W, uint32_t *H, uint8_t**data)
 {
-    ifstream ifs(path, ios::binary);
-    if(!ifs.is_open())
-    {
-        cout<<"[ERROR], read_bmp_file, Cannot open file: "<<path<<endl;
-        return 1;
-    }
-
-    BmpFileHeader fh;
-    BmpInfoHeader ih;
-    ifs.read((char*)(&fh), sizeof(BmpFileHeader));
-    ifs.read((char*)(&ih), sizeof(BmpInfoHeader));
-    int w = ih.width;
-    int h = abs(ih.height);
-    if(ih.imagesize != w*h)
-    {
-        cout<<"[ERROR], read_bmp_file, Only support 8-bit bmp image!"<<endl;
-        return 1;
-    }
-
-    uint8_t *data_addr = new uint8_t[w*h];
-    ifs.seekg(fh.offset, ios::beg);
-    if(ih.height <0 )
-    {
-        ifs.read((char*)data_addr, ih.imagesize);
-    }
-    else    // Flip image in vertical direction.
-    {
-        for(int r=h-1; r>=0; r--)
-        {
-            ifs.read((char*)(data_addr+w*r), w);
-        }
-    }
-
-    *W = w;
-    *H = h;
-    *data = data_addr;
-
-    return 0;
+    return read_bmp_file(path, W, H, data, 1);
 }
+
+/**
+ * @brief read_bmp_file_mono Read 24-bit rgb bmp image.
+ *        The memory is allocted inside.
+ * @param path [IN] Image path.
+ * @param W [OUT] Image width.
+ * @param H [OUT] Image height.
+ * @param data [OUT] Image data address.
+ * @return 0: success, others: fail.
+ */
+
+int read_bmp_file_rgb(string path, uint32_t *W, uint32_t *H, uint8_t**data)
+{
+    return read_bmp_file(path, W, H, data, 3);
+}
+

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.0.3, 2018-01-19T16:42:09. -->
+<!-- Written by QtCreator 4.0.3, 2018-01-19T18:45:49. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -234,7 +234,7 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">test_bmp2</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:E:/zkcv/src_test/bmp/test_bmp.pro</value>
     <value type="bool" key="QmakeProjectManager.QmakeRunConfiguration.UseLibrarySearchPath">true</value>
-    <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments">../data/indoor.bmp</value>
+    <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments">../data/indoor.bmp ../data/tulips.bmp</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">test_bmp.pro</value>
     <value type="bool" key="Qt4ProjectManager.Qt4RunConfiguration.UseDyldImageSuffix">false</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.UserWorkingDirectory"></value>
