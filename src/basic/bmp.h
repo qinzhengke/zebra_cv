@@ -1,6 +1,10 @@
 #ifndef __BMP_H__
 #define __BMP_H__
 
+#include <string>
+#include <stdint.h>
+using namespace std;
+
 /**
  * @brief save_bmp_file Save 8-bit gray image in bmp file.
  * @param path [IN] Save path.

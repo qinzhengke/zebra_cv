@@ -167,19 +167,3 @@ int read_bmp_file(string path, uint32_t *W, uint32_t *H, uint8_t**data)
 
     return 0;
 }
-
-// Test code, read and write bmp file.
-#if 1
-int main(char argc, char **argv)
-{
-
-    if(argc < 2)
-        return 1;
-
-    uint8_t *img;
-    uint32_t w, h;
-    read_bmp_file(string(argv[1]), &w, &h, &img);
-    save_bmp_file("output.bmp", w, h, img);
-    return 0;
-}
-#endif
