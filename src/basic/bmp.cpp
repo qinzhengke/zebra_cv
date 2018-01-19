@@ -68,7 +68,18 @@ int init_bmp_header(BmpFileHeader *fh, BmpInfoHeader *ih, int width, int height)
     return 0;
 }
 
-int save_bmp_file(string path, int width, int height, unsigned char *buf, uint8_t *palette = NULL)
+/**
+ * @brief save_bmp_file Save 8-bit gray image in bmp file.
+ * @param path [IN] Save path.
+ * @param width [IN] Image width.
+ * @param height [IN] Image height.
+ * @param buf [IN] Image data address.
+ * @param palette [IN] 8 bit palette, give NULL to create palette inside.
+ * @return 0: success, others: fail.
+ */
+
+int save_bmp_file(string path, int width, int height, unsigned char *buf,
+                  uint8_t *palette = NULL)
 {
     ofstream file(path, ios::binary);
     if (!file.is_open())
@@ -113,7 +124,7 @@ int save_bmp_file(string path, int width, int height, unsigned char *buf, uint8_
  * @param W [OUT] Image width.
  * @param H [OUT] Image height.
  * @param data [OUT] Image data address.
- * @return 0: success, non-0: fail.
+ * @return 0: success, others: fail.
  */
 int read_bmp_file(string path, uint32_t *W, uint32_t *H, uint8_t**data)
 {

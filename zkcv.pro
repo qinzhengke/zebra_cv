@@ -3,6 +3,7 @@ CONFIG += console
 
 # bmp file support
 TARGET = bmp
+HEADERS += src/basic/bmp.h
 SOURCES += src/basic/bmp.cpp
 
 # Image derivative
