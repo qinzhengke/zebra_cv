@@ -6,6 +6,59 @@ typedef unsigned int uint32_t;
 typedef int int32_t;
 typedef unsigned char uint8_t;
 
+int create_color_map(int N, uint8_t **cmap)
+{
+
+    *cmap = new uint8_t[N*3];
+    float r = 0.4;
+    int32_t s1=(int32_t)((float)N*r), s2 = N/2, s3=(int32_t)((float)N*(1.0-r));
+    float k1,k2,k3,k4;
+    k1 = 255.0 / r /(float)N;
+    k2 = -255.0/(0.5-r)/(float)N;
+    k3 = 255.0/(0.5-r)/(float)N;
+    k4 = -255.0 / r /(float)N;
+    for(int32_t i=0; i<N; i++)
+    {
+        if(i<s1)
+        {
+            *cmap[i*3] = 255;
+            float pix = k1 *(float)i;
+            if(pix<0.0) pix = 0.0;
+            else if(pix>255.0) pix = 255.0;
+            *cmap[i*3+1] = (uint8_t)(pix);
+            *cmap[i*3+2] = 0;
+        }
+        else if(i<s2)
+        {
+            float pix = k2*(float)(i-s2);
+            if(pix<0.0) pix = 0.0;
+            else if(pix>255.0) pix = 255.0;
+            *cmap[i*3] = (uint8_t)(pix);
+            *cmap[i*3+1] = 255;
+            *cmap[i*3+2] = 0;
+        }
+        else if(i<s3)
+        {
+            *cmap[i*3] = 0;
+            *cmap[i*3+1] = 255;
+            float pix = k3*(float)(i-s2);
+            if(pix<0.0) pix = 0.0;
+            else if(pix>255.0) pix = 255.0;
+            *cmap[i*3+2] = (uint8_t)(pix);
+        }
+        else
+        {
+            *cmap[i*3] = 0;
+            float pix = k4 *(float)(i-N);
+            if(pix<0.0) pix = 0.0;
+            else if(pix>255.0) pix = 255.0;
+            *cmap[i*3+1] =  (uint8_t)(pix);
+            *cmap[i*3+2] = 255;
+        }
+    }
+    return 0;
+}
+
 int cvt2color(float *img, uint32_t W, uint32_t H, uint8_t **img_out)
 {
     const int32_t N = 500;
