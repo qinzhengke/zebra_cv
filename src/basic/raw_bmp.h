@@ -30,9 +30,33 @@ typedef struct
 }color_map_t;
 #pragma pack(pop)
 
+/**
+ * @brief save_raw_bmp_file
+ * @param path [IN] output path
+ * @param width [IN]
+ * @param height [IN]
+ * @param type [IN] Map data type.
+ * @param buf [IN] Map start address.
+ * @param cmapN [IN] Color map bins
+ * @param cmap_min [IN] minimum value when convert to fake color.
+ * @param cmap_max [OUT] Maximum value when convert to fake color.
+ * @return 0 if success.
+ */
 int save_raw_bmp_file(string path, int width, int height, raw_bmp_type_t type,
                      uint8_t *buf,  int cmapN, double cmap_min, double cmap_max);
 
+/**
+ * @brief read_raw_bmp_file
+ * @param path [IN] Input path.
+ * @param W [IN]
+ * @param H [IN]
+ * @param type [IN] Map data type.
+ * @param data [OUT] raw data start address.
+ * @param data_rgb [OUT] bmp rgb data start address.
+ * @param cmap_out [OUT] color map, Only cmapN, min, and max are valid,
+ *        cmap.addr is null, which should be calculated when loading file.
+ * @return
+ */
 int read_raw_bmp_file(string path, int *W, int *H, raw_bmp_type_t *type,
                       void** data, uint8_t** data_rgb, color_map_t *cmap_out);
 
