@@ -4,4 +4,4 @@ CONFIG += console
 
 SOURCES += \
     test_transform.cpp \
-    ../../src/basic/transform.c
+    ../../src/basic/transform.cpp
