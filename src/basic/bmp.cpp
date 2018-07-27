@@ -6,6 +6,31 @@
 
 using namespace std;
 
+#ifndef PRINT_ERROR
+#define PRINT_ERROR(...)    \
+    do{ \
+        printf("\x1B[41;37m");      \
+        printf("[ERROR]");          \
+        printf("\x1B[0m");          \
+        printf("[%s] ", __func__);  \
+        printf(__VA_ARGS__);        \
+        printf("\n");               \
+    }while(0)
+#endif
+
+#ifndef PRINT_INFO
+#define PRINT_INFO(...)    \
+    do{ \
+        printf("\x1B[42;37m");      \
+        printf("[INFO] ");          \
+        printf("\x1B[0m");          \
+        printf(__VA_ARGS__);        \
+        printf("\n");               \
+    }while(0)
+#endif
+
+#define ALIGN(x,n) (((x) + (n) - 1) & ( ~((n)-1) ))
+
 # pragma pack(push)
 # pragma pack(1)
 typedef struct {
@@ -93,10 +118,11 @@ int init_bmp_header_rgb(BmpFileHeader *fh, BmpInfoHeader *ih, int width,
 
 int read_bmp_file(string path, uint32_t *W, uint32_t *H, uint8_t**data, int ch)
 {
+    PRINT_INFO("Reading image: %s", path.c_str());
     ifstream ifs(path, ios::binary);
     if(!ifs.is_open())
     {
-        cout<<"[ERROR], read_bmp_file, Cannot open file: "<<path<<endl;
+        PRINT_ERROR("Cannot open file: ", path.c_str());
         return 1;
     }
 
@@ -108,7 +134,8 @@ int read_bmp_file(string path, uint32_t *W, uint32_t *H, uint8_t**data, int ch)
     int h = abs(ih.height);
     if(ih.imagesize != ch*w*h)
     {
-        cout<<"[ERROR], read_bmp_file, image size != w*h*3 !"<<endl;
+        PRINT_ERROR("image size != w*h*ch !, w:%u, h:%u, ch:%d s:%u", w, h, ch,
+                    ih.imagesize);
         return 1;
     }
 
@@ -177,7 +204,14 @@ int save_bmp_file_mono(string path, int width, int height, unsigned char *buf,
     {
         file.write((char*)palette, 1024);
     }
-    file.write((char*)buf, ih.imagesize);
+
+//    file.write((char*)buf, ih.imagesize);
+
+    uint32_t row_bytes = ALIGN(width, 4); // Critical! 4 bytes align
+    for(int r=0; r<height; r++)
+    {
+        file.write((char*)buf + r*width, row_bytes);
+    }
     file.close();
 
 
@@ -198,8 +232,8 @@ int save_bmp_file_rgb(string path, int width, int height, unsigned char *buf)
     ofstream file(path, ios::binary);
     if (!file.is_open())
     {
-        cout<<"Cannot open file to write,"<<endl;
-        return 1;
+        PRINT_ERROR("Cannot open file to write: %s", path.c_str());
+        return -1;
     }
 
     BmpFileHeader fh;
@@ -243,4 +277,3 @@ int read_bmp_file_rgb(string path, uint32_t *W, uint32_t *H, uint8_t**data)
 {
     return read_bmp_file(path, W, H, data, 3);
 }
-

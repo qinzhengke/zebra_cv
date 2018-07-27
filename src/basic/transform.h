@@ -33,4 +33,11 @@ int down_sample(uint8_t* img_in, uint32_t W, uint32_t H, uint32_t d,
                 uint32_t pix_size, uint8_t **img_out, uint32_t *Wo,
                 uint32_t *Ho);
 
+
+int crop_image(uint8_t *img, uint32_t W, uint32_t H, uint32_t xl, uint32_t yt,
+                  uint32_t wp, uint32_t hp, uint8_t **patch);
+
+int calc_high_resolution(uint8_t *img, uint32_t W, uint32_t H, uint32_t facotr,
+                         uint8_t **img_out, uint32_t *Wo, uint32_t *Ho);
+
 #endif

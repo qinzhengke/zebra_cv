@@ -90,7 +90,7 @@ void test_rotate_right_angle()
 
 void test_down_sample()
 {
-    int W=10, H=8;
+    int W=10, H=10;
     uint8_t *map0 = new uint8_t[W*H];
     for(int i=0; i<W*H; i++)
     {

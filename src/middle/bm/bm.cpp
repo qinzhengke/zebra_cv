@@ -1,6 +1,112 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <limits.h>
+#include <float.h>
+
+#include "../../basic/compare.h"
+#include "../../basic/transform.h"
+
+
+#ifndef PRINT_ERROR
+#define PRINT_ERROR(...)    \
+    do{ \
+        printf("\x1B[41;37m");      \
+        printf("[ERROR]");          \
+        printf("\x1B[0m");          \
+        printf("[%s] ", __func__);  \
+        printf(__VA_ARGS__);        \
+        printf("\n");               \
+    }while(0)
+#endif
+
+#ifndef PRINT_INFO
+#define PRINT_INFO(...)    \
+    do{ \
+        printf("\x1B[42;37m");      \
+        printf("[INFO] ");          \
+        printf("\x1B[0m");          \
+        printf(__VA_ARGS__);        \
+        printf("\n");               \
+    }while(0)
+#endif
+
+#ifndef RETURN_IF_ERROR
+#define RETURN_IF_ERROR(x)  \
+    if(0 != (x))        \
+    {                   \
+        return (x);     \
+    }
+#endif
+
+int calc_local_disparity(uint8_t *img_l, uint32_t Wl, uint32_t Hl,
+                         uint8_t *img_r, uint32_t Wr, uint32_t Hr,
+                         uint32_t xl, uint32_t yt, uint32_t wp, uint32_t hp,
+                         float* min_cost_disp, float* min_cost)
+{
+
+    int st = 0;
+
+    uint8_t *patch_l, *patch_r;
+    uint32_t Wpl = wp, Hpl = hp, Wpr=xl+wp, Hpr=hp;
+    st = crop_image(img_l, Wl, Hl, xl, yt, Wpl, Hpl, &patch_l);
+    RETURN_IF_ERROR(st);
+//    save_bmp_file_mono("patch_l.bmp" , Wpl, Hpl, patch_l);
+
+    st = crop_image(img_r, Wr, Hr, 0, yt, Wpr, Hpr, &patch_r);
+    RETURN_IF_ERROR(st);
+//    save_bmp_file_mono("patch_r.bmp" , Wpr, Hpr, patch_r);
+
+
+    uint8_t *patch_l_h, *patch_r_h; // High resolution.
+    uint32_t Wplh, Hplh, Wprh, Hprh;
+    uint32_t factor = 10;
+
+    st = calc_high_resolution(patch_l, Wpl, Hpl, factor, &patch_l_h, &Wplh, &Hplh);
+    RETURN_IF_ERROR(st);
+//    save_bmp_file_mono("patch_h_l.bmp" , Wplh, Hplh, patch_l_h);
+
+    st = calc_high_resolution(patch_r, Wpr, Hpr, factor, &patch_r_h, &Wprh, &Hprh);
+    RETURN_IF_ERROR(st);
+//    save_bmp_file_mono("patch_h_r.bmp" , Wprh, Hprh, patch_r_h);
+
+    ofstream ofs_cost("cost.csv");
+    if(!ofs_cost.is_open())
+    {
+        PRINT_ERROR("Cannot open file: cost.txt");
+        return -1;
+    }
+    ofs_cost<<"disparity,cost"<<endl;
+
+    int max_disp_f = MAX_DISP*factor;   // Factored max disparity.
+    int min_cost_disp_f = 0;    // Factored min cost disparity
+    *min_cost = FLT_MAX;
+    for(int disp=0; disp<max_disp_f; disp++)
+    {
+        float cost = 0.0;
+        st = compare_patch(patch_l_h, Wplh, Hplh, patch_r_h, Wprh, Hprh,
+                           Wprh-Wplh-disp, 0, &cost);
+        RETURN_IF_ERROR(st)
+        cout<<"disp: "<<(float)disp/factor<<", cost: "<<cost<<endl;
+        ofs_cost<<(float)disp/factor<<","<<cost<<endl;
+        if(cost < *min_cost)
+        {
+            *min_cost = cost;
+            min_cost_disp_f = disp;
+        }
+    }
+    ofs_cost.close();
+
+    cout<<"min cost:"<<*min_cost<<", disp:"<<(float)min_cost_disp_f/(float)factor<<endl;
+    uint8_t *patch_min_cost;
+    st = crop_image(patch_r_h, Wprh, Hprh, Wprh-Wplh-min_cost_disp_f, 0, Wplh,
+                    Hplh, &patch_min_cost);
+    RETURN_IF_ERROR(st);
+//    save_bmp_file_mono("patch_min_cost.bmp", Wplh, Hplh, patch_min_cost);
+
+    *min_cost_disp = (float)min_cost_disp_f/(float)factor;
+
+    return 0;
+}
 
 
 /**
