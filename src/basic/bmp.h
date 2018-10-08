@@ -15,7 +15,7 @@ using namespace std;
  * @return 0: success, others: fail.
  */
 
-int save_bmp_file_mono(string path, int width, int height, unsigned char *buf,
+int save_bmp_file_mono(string path, int32_t width, int32_t height, unsigned char *buf,
                   uint8_t *palette = NULL);
 
 /**
@@ -27,7 +27,7 @@ int save_bmp_file_mono(string path, int width, int height, unsigned char *buf,
  * @return 0: success, others: fail.
  */
 
-int save_bmp_file_rgb(string path, int width, int height, unsigned char *buf);
+int save_bmp_file_rgb(string path, int32_t width, int32_t height, unsigned char *buf);
 
 /**
  * @brief read_bmp_file_mono Read 8-bit mono bmp image.
@@ -39,7 +39,7 @@ int save_bmp_file_rgb(string path, int width, int height, unsigned char *buf);
  * @return 0: success, others: fail.
  */
 
-int read_bmp_file_mono(string path, uint32_t *W, uint32_t *H, uint8_t**data);
+int read_bmp_file_mono(string path, int32_t *W, int32_t *H, uint8_t**data);
 
 /**
  * @brief read_bmp_file_mono Read 24-bit rgb bmp image.
@@ -51,6 +51,6 @@ int read_bmp_file_mono(string path, uint32_t *W, uint32_t *H, uint8_t**data);
  * @return 0: success, others: fail.
  */
 
-int read_bmp_file_rgb(string path, uint32_t *W, uint32_t *H, uint8_t**data);
+int read_bmp_file_rgb(string path, int32_t *W, int32_t *H, uint8_t**data);
 
 #endif

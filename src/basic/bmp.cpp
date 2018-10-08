@@ -116,7 +116,7 @@ int init_bmp_header_rgb(BmpFileHeader *fh, BmpInfoHeader *ih, int width,
     return 0;
 }
 
-int read_bmp_file(string path, uint32_t *W, uint32_t *H, uint8_t**data, int ch)
+int read_bmp_file(string path, int32_t *W, int32_t *H, uint8_t**data, int ch)
 {
     PRINT_INFO("Reading image: %s", path.c_str());
     ifstream ifs(path, ios::binary);
@@ -171,7 +171,7 @@ int read_bmp_file(string path, uint32_t *W, uint32_t *H, uint8_t**data, int ch)
  * @return 0: success, others: fail.
  */
 
-int save_bmp_file_mono(string path, int width, int height, unsigned char *buf,
+int save_bmp_file_mono(string path, int32_t width, int32_t height, unsigned char *buf,
                   uint8_t *palette = NULL)
 {
     ofstream file(path, ios::binary);
@@ -227,7 +227,7 @@ int save_bmp_file_mono(string path, int width, int height, unsigned char *buf,
  * @return 0: success, others: fail.
  */
 
-int save_bmp_file_rgb(string path, int width, int height, unsigned char *buf)
+int save_bmp_file_rgb(string path, int32_t width, int32_t height, unsigned char *buf)
 {
     ofstream file(path, ios::binary);
     if (!file.is_open())
@@ -258,7 +258,7 @@ int save_bmp_file_rgb(string path, int width, int height, unsigned char *buf)
  * @return 0: success, others: fail.
  */
 
-int read_bmp_file_mono(string path, uint32_t *W, uint32_t *H, uint8_t**data)
+int read_bmp_file_mono(string path, int32_t *W, int32_t *H, uint8_t**data)
 {
     return read_bmp_file(path, W, H, data, 1);
 }
@@ -273,7 +273,7 @@ int read_bmp_file_mono(string path, uint32_t *W, uint32_t *H, uint8_t**data)
  * @return 0: success, others: fail.
  */
 
-int read_bmp_file_rgb(string path, uint32_t *W, uint32_t *H, uint8_t**data)
+int read_bmp_file_rgb(string path, int32_t *W, int32_t *H, uint8_t**data)
 {
     return read_bmp_file(path, W, H, data, 3);
 }
