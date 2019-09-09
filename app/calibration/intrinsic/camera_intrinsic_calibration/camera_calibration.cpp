@@ -437,7 +437,7 @@ int main(int argc, char* argv[])
         //------------------------------ Show image and check for input commands -------------------
         //! [await_input]
         imshow("Image View", view);
-        char key = (char)waitKey(s.inputCapture.isOpened() ? 50 : s.delay);
+        char key = (char)waitKey(s.inputCapture.isOpened() ? 5000 : s.delay);
 
         if( key  == ESC_KEY )
             break;
@@ -469,10 +469,17 @@ int main(int argc, char* argv[])
         }
         else
         {
-            initUndistortRectifyMap(
-                cameraMatrix, distCoeffs, Mat(),
-                getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0), imageSize,
-                CV_16SC2, map1, map2);
+            cv::Mat optCamMat = getOptimalNewCameraMatrix(cameraMatrix,
+                                                          distCoeffs,
+                                                          imageSize, 1,
+                                                          imageSize, NULL);
+
+//            initUndistortRectifyMap(
+//                cameraMatrix, distCoeffs, Mat(),
+//                getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0), imageSize,
+//                CV_16SC2, map1, map2);
+            initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(), optCamMat,
+                                    imageSize, CV_16SC2, map1, map2);
         }
 
         for(size_t i = 0; i < s.imageList.size(); i++ )
