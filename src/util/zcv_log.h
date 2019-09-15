@@ -11,7 +11,7 @@ typedef enum
 {
     ZCV_RET_FATAL = -2,
     ZCV_RET_ERROR = -1,
-    ZCV_RET_SUCCESS = 0,
+    ZCV_RET_OK = 0,
     ZCV_RET_WARNING = 1,
 } zcv_ret_type_t;
 

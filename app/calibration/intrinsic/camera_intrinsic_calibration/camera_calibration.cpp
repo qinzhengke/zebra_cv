@@ -12,7 +12,8 @@
 #include <opencv2/videoio.hpp>
 #include <opencv2/highgui.hpp>
 
-#include "zcv_core.hpp"
+#include "zcv_core.h"
+#include "zcv_util.hpp"
 
 #define BACKWARD_HAS_DW 1
 #include <backward.hpp>
